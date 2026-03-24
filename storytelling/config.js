@@ -166,14 +166,14 @@ var config = {
             callback: '',
             onChapterEnter: [
                 {
-                    layer: 'mapbox-satellite',
+                    layer: 'satellite-imagery',
                     opacity: 1,
                     duration: 5000
                 }
             ],
             onChapterExit: [
                 {
-                    layer: 'mapbox-satellite',
+                    layer: 'satellite-imagery',
                     opacity: 0,
                     duration: 5000
                 }
@@ -290,14 +290,14 @@ var config = {
             callback: '',
             onChapterEnter: [
                 {
-                    layer: 'mapbox-satellite',
+                    layer: 'satellite-imagery',
                     opacity: 1,
                     duration: 5000
                 }
             ],
             onChapterExit: [
                 {
-                    layer: 'mapbox-satellite',
+                    layer: 'satellite-imagery',
                     opacity: 0,
                     duration: 5000
                 }

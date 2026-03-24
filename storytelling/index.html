@@ -276,9 +276,9 @@
                 tileSize: 256,
                 attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
             });
-            // Layer id kept as 'mapbox-satellite' to avoid changing config.js chapter references
+            // Satellite imagery overlay used in selected chapters
             map.addLayer({
-                id: 'mapbox-satellite',
+                id: 'satellite-imagery',
                 type: 'raster',
                 source: 'satellite',
                 paint: { 'raster-opacity': 0 }
