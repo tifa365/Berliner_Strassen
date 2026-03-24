@@ -1,11 +1,6 @@
 var config = {
-    style: 'mapbox://styles/blauedaecher/cmle8e5pe003u01r0a9vse3yf',
-    // leave commented to use Mapbox Standard Style
-    accessToken: 'pk.eyJ1IjoiYmxhdWVkYWVjaGVyIiwiYSI6ImNraWlvNnNxaTA0ZWEyd291YzV5cXowMG8ifQ.oepMB4-h8Xy-X9sc1dYvVQ',
+    style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
     showMarkers: false,
-    //projection: 'equirectangular',
-    //Read more about available projections here
-    //https://docs.mapbox.com/mapbox-gl-js/example/projections/
     inset: false,
     theme: 'dark',
     use3dTerrain: false, //set true for enabling 3D maps.
@@ -13,7 +8,7 @@ var config = {
     title: '🧬 Münchens DNA in Straßennamen',
     //subtitle: 'Mehr als nur eine Adresse',
     byline: 'Sören Etler, Open Data Analyst',
-    footer: 'Datenquelle: <a href="https://opendata.muenchen.de/dataset/baut_strassenabschnitte_wu" target="_blank">Straßennetzgraf Baureferat Tiefbau</a>, <a href="https://opendata.muenchen.de/dataset/adressen_opendata" target="_blank">Münchner Adressen</a> <br> Created using <a href="https://github.com/mapbox/storytelling" target="_blank">Mapbox Storytelling</a> template.<br></br>by Sören Etler | <a href="https://soerenetler.de/de/page/impressum/" target="_blank">Impressum</a>',
+    footer: 'Datenquelle: <a href="https://opendata.muenchen.de/dataset/baut_strassenabschnitte_wu" target="_blank">Straßennetzgraf Baureferat Tiefbau</a>, <a href="https://opendata.muenchen.de/dataset/adressen_opendata" target="_blank">Münchner Adressen</a> <br> Created using <a href="https://maplibre.org/maplibre-gl-js/docs/" target="_blank">MapLibre GL JS</a> + <a href="https://github.com/russellsamora/scrollama" target="_blank">Scrollama</a>.<br></br>by Sören Etler | <a href="https://soerenetler.de/de/page/impressum/" target="_blank">Impressum</a>',
     chapters: [
         {
             id: 'intro',
