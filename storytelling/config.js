@@ -63,7 +63,7 @@ var config = {
             hidden: false,
             title: 'Adlergestell',
             // image: './assets/adlergestell.jpg',
-            description: 'Die längste zusammenhängende benannte Straße Berlins heißt <b>Adlergestell</b> – und die meisten Berliner*innen könnten ihren Verlauf nicht einmal grob skizzieren. 13 Kilometer zieht sie sich durch Treptow-Köpenick, von Niederschöneweide bis an die Stadtgrenze. Ihr Name verweist auf einen alten Weg durch den Köpenicker Stadtforst. An ihr liegt Adlershof: Schauplatz der ersten deutschen Motorflüge 1909, später NS-Forschungsgelände, dann DDR-Fernsehzentrum, heute Wissenschaftsstadt und Medienstandort. Ähnlich wie Münchens Dachauer Straße – die über fünf Stadtbezirke zu einem Schloss im Umland führt – sind auch Berlins längste Straßen historische Sehnsuchtswege. Nur führen sie hier nicht zu Schlössern, sondern zu Zukunftsträumen.',
+            description: 'Im Berliner Straßenregister ist das <b>Adlergestell</b> mit rund <b>13,3 Kilometern</b> die längste zusammenhängend erfasste Straße. Sie verläuft durch <b>Treptow-Köpenick</b> und macht sichtbar, wie weit sich Berlin im Südosten ausdehnt.',
             location: {
                 center: [13.535, 52.440],
                 zoom: 12,
@@ -124,7 +124,7 @@ var config = {
             alignment: 'right',
             hidden: false,
             title: 'Landsberger Allee',
-            description: 'Die <b>Landsberger Allee</b> ist nach Landsberg an der Warthe benannt – heute Gorzów Wielkopolski in Polen. Straßennamen konservieren Geographien, die längst verschwunden sind: die Landschaft vor dem Krieg, die Städte vor der Verschiebung der Grenzen. Auch München hat eine Landsberger Straße – benannt nach einem anderen Landsberg. Und Leipzig. Überall im Land laufen die alten Sehnsuchtswege in Schildern weiter, lange nachdem die Wege selbst Geschichte wurden. Sie alle stammen aus einer Zeit, als Straßennamen noch echte Wegweiser in die Welt waren.',
+            description: 'Die <b>Landsberger Allee</b> verweist auf das frühere <b>Landsberg an der Warthe</b>, heute <b>Gorzów Wielkopolski</b> in Polen. Straßennamen konservieren Geographien, die politisch verschwunden sind, auf Berliner Schildern aber weiterleben.',
             location: {
                 center: [13.468, 52.527],
                 zoom: 12,
@@ -154,7 +154,7 @@ var config = {
             alignment: 'right',
             hidden: false,
             title: 'Kietz',
-            description: 'Berlin ist ein Millionendorf – und trägt die Dörfer noch in sich. Das Wort <b>Kietz</b>, heute Slang für das eigene Viertel, ist älter als die Stadt selbst: Es kommt vom slawischen „kez" und bezeichnete die Siedlungen der Wenden, bevor die Markgrafen aus Brandenburg das Land übernahmen. In Köpenick und Spandau gibt es noch Straßen, die diesen Namen tragen – stille Zeugen einer Zeit, als hier kein Deutsch gesprochen wurde. Wie Münchens Dorfstraße in Obermenzing zeigt der Berliner Kietz: Millionenstädte wachsen um ihre Dörfer herum, nicht über sie hinweg.',
+            description: 'Berlin ist ein Millionendorf – und trägt die Dörfer noch in sich. Das Wort <b>Kietz</b>, heute Slang für das eigene Viertel, ist älter als die Stadt selbst: Es geht auf slawische Siedlungen zurück, die schon vor der brandenburgischen Expansion bestanden.',
             location: {
                 center: [13.578, 52.443],
                 zoom: 15,
