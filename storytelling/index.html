@@ -171,6 +171,46 @@
             });
         }
 
+        function setPaintIfLayerExists(layerId, prop, value) {
+            if (map.getLayer(layerId)) {
+                try {
+                    map.setPaintProperty(layerId, prop, value);
+                } catch (err) {
+                    // Ignore unsupported paint properties on third-party basemap layers.
+                }
+            }
+        }
+
+        function tuneBasemap() {
+            ['landcover', 'park_national_park', 'park_nature_reserve', 'landuse'].forEach(function (id) {
+                setPaintIfLayerExists(id, 'fill-color', '#181818');
+            });
+            setPaintIfLayerExists('background', 'background-color', '#181818');
+            setPaintIfLayerExists('landuse_residential', 'fill-color', 'rgba(40, 40, 40, 0.28)');
+            setPaintIfLayerExists('water', 'fill-color', '#3a4650');
+            setPaintIfLayerExists('waterway', 'line-color', '#516675');
+
+            [
+                'road_service_case', 'road_minor_case', 'road_sec_case_noramp', 'road_pri_case_ramp',
+                'road_pri_case_noramp', 'road_trunk_case_ramp', 'road_trunk_case_noramp',
+                'road_mot_case_ramp', 'road_mot_case_noramp', 'bridge_service_case',
+                'bridge_minor_case', 'bridge_sec_case', 'bridge_pri_case',
+                'bridge_trunk_case', 'bridge_mot_case'
+            ].forEach(function (id) {
+                setPaintIfLayerExists(id, 'line-color', '#2c2c2c');
+            });
+
+            [
+                'road_service_fill', 'road_minor_fill', 'road_sec_fill_noramp', 'road_pri_fill_ramp',
+                'road_pri_fill_noramp', 'road_trunk_fill_ramp', 'road_trunk_fill_noramp',
+                'road_mot_fill_ramp', 'road_mot_fill_noramp', 'bridge_service_fill',
+                'bridge_minor_fill', 'bridge_sec_fill', 'bridge_pri_fill',
+                'bridge_trunk_fill', 'bridge_mot_fill'
+            ].forEach(function (id) {
+                setPaintIfLayerExists(id, 'line-color', '#4a4a4a');
+            });
+        }
+
         // Build story DOM
         var story = document.getElementById('story');
         var features = document.createElement('div');
@@ -269,6 +309,8 @@
         var scroller = scrollama();
 
         map.on('load', function () {
+            tuneBasemap();
+
             // Satellite raster overlay (Esri World Imagery, free for display use)
             map.addSource('satellite', {
                 type: 'raster',
@@ -288,6 +330,48 @@
             map.addSource('strassen', {
                 type: 'geojson',
                 data: './data/strassen_berlin_wgs84.geojson'
+            });
+
+            map.addLayer({
+                id: 'all-streets-overview-case',
+                type: 'line',
+                source: 'strassen',
+                layout: {
+                    'line-cap': 'butt',
+                    'line-join': 'miter'
+                },
+                paint: {
+                    'line-color': '#242424',
+                    'line-width': [
+                        'interpolate', ['linear'], ['zoom'],
+                        9, 1.4,
+                        10.5, 2.3,
+                        12, 3.6,
+                        14, 5.6
+                    ],
+                    'line-opacity': 0
+                }
+            });
+
+            map.addLayer({
+                id: 'all-streets-overview',
+                type: 'line',
+                source: 'strassen',
+                layout: {
+                    'line-cap': 'butt',
+                    'line-join': 'miter'
+                },
+                paint: {
+                    'line-color': '#f3efe6',
+                    'line-width': [
+                        'interpolate', ['linear'], ['zoom'],
+                        9, 0.9,
+                        10.5, 1.5,
+                        12, 2.3,
+                        14, 3.5
+                    ],
+                    'line-opacity': 0
+                }
             });
 
             // Highlight layers — all start invisible, toggled by chapter enter/exit.
@@ -347,6 +431,10 @@
                     }
                 });
             });
+
+            if (config.chapters[0].onChapterEnter.length > 0) {
+                config.chapters[0].onChapterEnter.forEach(setLayerOpacity);
+            }
 
             scroller
                 .setup({

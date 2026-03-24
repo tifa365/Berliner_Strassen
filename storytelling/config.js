@@ -23,8 +23,30 @@ var config = {
             mapAnimation: 'flyTo',
             rotateAnimation: false,
             callback: '',
-            onChapterEnter: [],
-            onChapterExit: []
+            onChapterEnter: [
+                {
+                    layer: 'all-streets-overview-case',
+                    opacity: 0.82,
+                    duration: 1200
+                },
+                {
+                    layer: 'all-streets-overview',
+                    opacity: 0.92,
+                    duration: 1200
+                }
+            ],
+            onChapterExit: [
+                {
+                    layer: 'all-streets-overview-case',
+                    opacity: 0,
+                    duration: 1200
+                },
+                {
+                    layer: 'all-streets-overview',
+                    opacity: 0,
+                    duration: 1200
+                }
+            ]
         },
         {
             id: 'sonnenallee',
