@@ -3,7 +3,7 @@
 
 <head>
     <meta charset='utf-8' />
-    <title>🧬 Münchens DNA in Straßennamen</title>
+    <title>🧬 Berlins DNA in Straßennamen</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js'></script>
     <link href='https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css' rel='stylesheet' />
@@ -294,41 +294,42 @@
             // Field names from the Berlin GeoJSON: strname (street name), bezname (Bezirk).
             var streetLayers = [
                 {
-                    id: 'schleissheimer-str',
-                    filter: ['==', ['get', 'strname'], 'Schleißheimer Str.'],
+                    id: 'sonnenallee',
+                    filter: ['==', ['get', 'strname'], 'Sonnenallee'],
                     color: '#e74c3c'
                 },
                 {
-                    id: 'dachauer-str',
-                    filter: ['==', ['get', 'strname'], 'Dachauer Str.'],
+                    id: 'adlergestell',
+                    filter: ['==', ['get', 'strname'], 'Adlergestell'],
                     color: '#e74c3c'
                 },
                 {
-                    id: 'ladsberger-str', // original id kept (typo preserved) to match config.js
-                    filter: ['==', ['get', 'strname'], 'Landsberger Str.'],
+                    id: 'karl-marx-allee',
+                    filter: ['==', ['get', 'strname'], 'Karl-Marx-Allee'],
                     color: '#e74c3c'
                 },
                 {
-                    id: 'dorfstr',
-                    filter: ['==', ['get', 'strname'], 'Dorfstraße'],
+                    id: 'landsberger-allee',
+                    filter: ['==', ['get', 'strname'], 'Landsberger Allee'],
                     color: '#e74c3c'
                 },
                 {
-                    // Berlin has no address count field — placeholder until equivalent is identified
+                    // No address count in Berlin WFS — placeholder until address data is available
                     id: 'geister-strassen',
                     filter: ['boolean', false],
                     color: '#95a5a6'
                 },
                 {
-                    id: 'platz-der-opfer-des-nationalsozialismus',
-                    filter: ['==', ['get', 'strname'], 'Platz der Opfer des Nationalsozialismus'],
+                    // Mohrenstraße was renamed to Anton-Wilhelm-Amo-Straße (OVG ruling 9 July 2025).
+                    // WFS data (© 2024) may still use the old name — both are included.
+                    id: 'anton-wilhelm-amo-strasse',
+                    filter: ['in', ['get', 'strname'], ['literal', ['Anton-Wilhelm-Amo-Straße', 'Mohrenstraße']]],
                     color: '#f39c12'
                 },
                 {
-                    // TODO: Replace the filter with the official 2021 city archive list of
-                    // 45 street names with "erhöhtem Diskussionsbedarf" once data is available.
-                    id: 'strassennamen-mit-erhoehtem-diskussionsbedarf',
-                    filter: ['boolean', false],
+                    // Afrikanisches Viertel streets with colonial names under active debate
+                    id: 'afrikanisches-viertel',
+                    filter: ['in', ['get', 'strname'], ['literal', ['Nachtigalplatz', 'Lüderitzstraße', 'Petersallee']]],
                     color: '#8e44ad'
                 }
             ];
