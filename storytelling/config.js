@@ -6,7 +6,7 @@ var config = {
     use3dTerrain: false,
     auto: false,
     title: '🧬 Berlins DNA in Straßennamen',
-    byline: 'Sören Etler, Open Data Analyst',
+    byline: '',
     footer: 'Datenquelle: <a href="https://daten.berlin.de/datensaetze/stra%C3%9Fenabschnitte-berlin" target="_blank">Straßenabschnitte RBS Berlin</a> (Amt für Statistik Berlin-Brandenburg, CC-BY-3.0) <br> Created using <a href="https://maplibre.org/maplibre-gl-js/docs/" target="_blank">MapLibre GL JS</a> + <a href="https://github.com/russellsamora/scrollama" target="_blank">Scrollama</a>.<br></br>by Sören Etler | <a href="https://soerenetler.de/de/page/impressum/" target="_blank">Impressum</a>',
     chapters: [
         {
