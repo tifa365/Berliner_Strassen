@@ -287,40 +287,41 @@
             // Local GeoJSON street data
             map.addSource('strassen', {
                 type: 'geojson',
-                data: '../processed_data/strassen_adressen_muenchen_wgs84.geojson'
+                data: './data/strassen_berlin_wgs84.geojson'
             });
 
             // Highlight layers — all start invisible, toggled by chapter enter/exit.
-            // Field names from the GeoJSON: STRANAM (street name), HSZ (address count).
+            // Field names from the Berlin GeoJSON: strname (street name), bezname (Bezirk).
             var streetLayers = [
                 {
                     id: 'schleissheimer-str',
-                    filter: ['==', ['get', 'STRANAM'], 'Schleißheimer Str.'],
+                    filter: ['==', ['get', 'strname'], 'Schleißheimer Str.'],
                     color: '#e74c3c'
                 },
                 {
                     id: 'dachauer-str',
-                    filter: ['==', ['get', 'STRANAM'], 'Dachauer Str.'],
+                    filter: ['==', ['get', 'strname'], 'Dachauer Str.'],
                     color: '#e74c3c'
                 },
                 {
                     id: 'ladsberger-str', // original id kept (typo preserved) to match config.js
-                    filter: ['==', ['get', 'STRANAM'], 'Landsberger Str.'],
+                    filter: ['==', ['get', 'strname'], 'Landsberger Str.'],
                     color: '#e74c3c'
                 },
                 {
                     id: 'dorfstr',
-                    filter: ['==', ['get', 'STRANAM'], 'Dorfstraße'],
+                    filter: ['==', ['get', 'strname'], 'Dorfstraße'],
                     color: '#e74c3c'
                 },
                 {
+                    // Berlin has no address count field — placeholder until equivalent is identified
                     id: 'geister-strassen',
-                    filter: ['==', ['get', 'HSZ'], 0],
+                    filter: ['boolean', false],
                     color: '#95a5a6'
                 },
                 {
                     id: 'platz-der-opfer-des-nationalsozialismus',
-                    filter: ['==', ['get', 'STRANAM'], 'Platz der Opfer des Nationalsozialismus'],
+                    filter: ['==', ['get', 'strname'], 'Platz der Opfer des Nationalsozialismus'],
                     color: '#f39c12'
                 },
                 {
