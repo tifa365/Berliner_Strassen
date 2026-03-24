@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Münchner Straßen** is a geospatial data project about Munich street names with two components:
+**Münchner Straßen** is a geospatial data project about Munich street names — and the **long-term goal is to replicate this for Berlin**. Keep that in mind when making architectural decisions: prefer generic, city-agnostic structures over Munich-specific hardcoding where reasonable.
+
+The project currently has two components:
 
 1. **StreetGuesser** — A Streamlit game where users guess the location of a random Munich street on a map
 2. **Storytelling Map** — A Mapbox GL JS scroll-driven narrative about Munich's street naming history, deployed to GitHub Pages
