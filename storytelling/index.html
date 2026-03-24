@@ -157,12 +157,64 @@
             'full': 'fully'
         };
 
+        var basemapRoadCaseLayerIds = [
+            'road_service_case', 'road_minor_case', 'road_sec_case_noramp', 'road_pri_case_ramp',
+            'road_pri_case_noramp', 'road_trunk_case_ramp', 'road_trunk_case_noramp',
+            'road_mot_case_ramp', 'road_mot_case_noramp', 'bridge_service_case',
+            'bridge_minor_case', 'bridge_sec_case', 'bridge_pri_case',
+            'bridge_trunk_case', 'bridge_mot_case'
+        ];
+
+        var basemapRoadFillLayerIds = [
+            'road_service_fill', 'road_minor_fill', 'road_sec_fill_noramp', 'road_pri_fill_ramp',
+            'road_pri_fill_noramp', 'road_trunk_fill_ramp', 'road_trunk_fill_noramp',
+            'road_mot_fill_ramp', 'road_mot_fill_noramp', 'bridge_service_fill',
+            'bridge_minor_fill', 'bridge_sec_fill', 'bridge_pri_fill',
+            'bridge_trunk_fill', 'bridge_mot_fill'
+        ];
+
+        var streetHighlightColors = {};
+        var streetGlowLayerIds = {};
+
         function getLayerPaintType(layer) {
             return layerTypes[map.getLayer(layer).type];
         }
 
         function setLayerOpacity(layer) {
-            var paintProps = getLayerPaintType(layer.layer);
+            var mapLayer = map.getLayer(layer.layer);
+            var layerType = mapLayer.type;
+
+            if (layerType === 'line' && streetHighlightColors[layer.layer]) {
+                var highlightColor = layer.color || (layer.opacity > 0 ? streetHighlightColors[layer.layer] : '#ffffff');
+                var highlightOpacity = layer.highlightOpacity != null
+                    ? layer.highlightOpacity
+                    : (layer.opacity > 0 ? Math.min(layer.opacity, 0.82) : layer.opacity);
+                var highlightWidth = layer.highlightWidth != null
+                    ? layer.highlightWidth
+                    : (layer.opacity > 0 ? 6 : 4);
+                var opacityDuration = layer.opacity > 0 ? 700 : 500;
+                var glowLayerId = streetGlowLayerIds[layer.layer];
+
+                if (layer.duration) {
+                    map.setPaintProperty(layer.layer, 'line-color-transition', { duration: layer.duration });
+                    map.setPaintProperty(layer.layer, 'line-opacity-transition', { duration: opacityDuration });
+                    map.setPaintProperty(layer.layer, 'line-width-transition', { duration: 650 });
+                    if (glowLayerId) {
+                        map.setPaintProperty(glowLayerId, 'line-opacity-transition', { duration: 450 });
+                    }
+                }
+
+                if (glowLayerId) {
+                    map.setPaintProperty(glowLayerId, 'line-color', highlightColor);
+                    map.setPaintProperty(glowLayerId, 'line-opacity', layer.opacity > 0 ? 0.22 : 0);
+                }
+                map.setPaintProperty(layer.layer, 'line-color', highlightColor);
+                map.setPaintProperty(layer.layer, 'line-opacity', highlightOpacity);
+                map.setPaintProperty(layer.layer, 'line-width', highlightWidth);
+                return;
+            }
+
+            var paintProps = layerTypes[layerType];
             paintProps.forEach(function (prop) {
                 if (layer.duration) {
                     map.setPaintProperty(layer.layer, prop + '-transition', { duration: layer.duration });
@@ -181,6 +233,25 @@
             }
         }
 
+        function setBasemapRoadPalette(caseColor, fillColor, transitionDuration) {
+            basemapRoadCaseLayerIds.forEach(function (id) {
+                setPaintIfLayerExists(id, 'line-color-transition', { duration: transitionDuration });
+                setPaintIfLayerExists(id, 'line-color', caseColor);
+            });
+
+            basemapRoadFillLayerIds.forEach(function (id) {
+                setPaintIfLayerExists(id, 'line-color-transition', { duration: transitionDuration });
+                setPaintIfLayerExists(id, 'line-color', fillColor);
+            });
+        }
+
+        function setBasemapRoadOpacity(opacity, transitionDuration) {
+            basemapRoadCaseLayerIds.concat(basemapRoadFillLayerIds).forEach(function (id) {
+                setPaintIfLayerExists(id, 'line-opacity-transition', { duration: transitionDuration });
+                setPaintIfLayerExists(id, 'line-opacity', opacity);
+            });
+        }
+
         function tuneBasemap() {
             ['landcover', 'park_national_park', 'park_nature_reserve', 'landuse'].forEach(function (id) {
                 setPaintIfLayerExists(id, 'fill-color', '#181818');
@@ -189,26 +260,24 @@
             setPaintIfLayerExists('landuse_residential', 'fill-color', 'rgba(40, 40, 40, 0.28)');
             setPaintIfLayerExists('water', 'fill-color', '#3a4650');
             setPaintIfLayerExists('waterway', 'line-color', '#516675');
+            setBasemapRoadPalette('#2c2c2c', '#4a4a4a', 0);
+        }
 
-            [
-                'road_service_case', 'road_minor_case', 'road_sec_case_noramp', 'road_pri_case_ramp',
-                'road_pri_case_noramp', 'road_trunk_case_ramp', 'road_trunk_case_noramp',
-                'road_mot_case_ramp', 'road_mot_case_noramp', 'bridge_service_case',
-                'bridge_minor_case', 'bridge_sec_case', 'bridge_pri_case',
-                'bridge_trunk_case', 'bridge_mot_case'
-            ].forEach(function (id) {
-                setPaintIfLayerExists(id, 'line-color', '#2c2c2c');
-            });
+        function setIntroRoadPalette(active) {
+            if (active) {
+                setBasemapRoadOpacity(0, 700);
+            } else {
+                setBasemapRoadOpacity(1, 500);
+                setBasemapRoadPalette('#2c2c2c', '#4a4a4a', 500);
+            }
+        }
 
-            [
-                'road_service_fill', 'road_minor_fill', 'road_sec_fill_noramp', 'road_pri_fill_ramp',
-                'road_pri_fill_noramp', 'road_trunk_fill_ramp', 'road_trunk_fill_noramp',
-                'road_mot_fill_ramp', 'road_mot_fill_noramp', 'bridge_service_fill',
-                'bridge_minor_fill', 'bridge_sec_fill', 'bridge_pri_fill',
-                'bridge_trunk_fill', 'bridge_mot_fill'
-            ].forEach(function (id) {
-                setPaintIfLayerExists(id, 'line-color', '#4a4a4a');
-            });
+        function activateIntroEffects() {
+            setIntroRoadPalette(true);
+        }
+
+        function deactivateIntroEffects() {
+            setIntroRoadPalette(false);
         }
 
         // Build story DOM
@@ -341,13 +410,13 @@
                     'line-join': 'miter'
                 },
                 paint: {
-                    'line-color': '#242424',
+                    'line-color': 'rgba(255, 255, 255, 0)',
                     'line-width': [
                         'interpolate', ['linear'], ['zoom'],
-                        9, 1.4,
-                        10.5, 2.3,
-                        12, 3.6,
-                        14, 5.6
+                        9, 1.1,
+                        10.5, 1.8,
+                        12, 2.8,
+                        14, 4.4
                     ],
                     'line-opacity': 0
                 }
@@ -362,13 +431,13 @@
                     'line-join': 'miter'
                 },
                 paint: {
-                    'line-color': '#f3efe6',
+                    'line-color': '#ffffff',
                     'line-width': [
                         'interpolate', ['linear'], ['zoom'],
-                        9, 0.9,
-                        10.5, 1.5,
-                        12, 2.3,
-                        14, 3.5
+                        9, 1.0,
+                        10.5, 1.8,
+                        12, 2.8,
+                        14, 4.2
                     ],
                     'line-opacity': 0
                 }
@@ -398,6 +467,11 @@
                     color: '#e74c3c'
                 },
                 {
+                    id: 'eiergasse',
+                    filter: ['==', ['get', 'strname'], 'Eiergasse'],
+                    color: '#f1c40f'
+                },
+                {
                     // No address count in Berlin WFS — placeholder until address data is available
                     id: 'geister-strassen',
                     filter: ['boolean', false],
@@ -419,13 +493,39 @@
             ];
 
             streetLayers.forEach(function (l) {
+                streetHighlightColors[l.id] = l.color;
+                streetGlowLayerIds[l.id] = l.id + '-glow';
+            });
+
+            streetLayers.forEach(function (l) {
+                map.addLayer({
+                    id: streetGlowLayerIds[l.id],
+                    type: 'line',
+                    source: 'strassen',
+                    filter: l.filter,
+                    layout: {
+                        'line-cap': 'round',
+                        'line-join': 'round'
+                    },
+                    paint: {
+                        'line-color': l.color,
+                        'line-width': 10,
+                        'line-blur': 2,
+                        'line-opacity': 0
+                    }
+                });
+
                 map.addLayer({
                     id: l.id,
                     type: 'line',
                     source: 'strassen',
                     filter: l.filter,
+                    layout: {
+                        'line-cap': 'round',
+                        'line-join': 'round'
+                    },
                     paint: {
-                        'line-color': l.color,
+                        'line-color': '#ffffff',
                         'line-width': 4,
                         'line-opacity': 0
                     }
@@ -434,6 +534,9 @@
 
             if (config.chapters[0].onChapterEnter.length > 0) {
                 config.chapters[0].onChapterEnter.forEach(setLayerOpacity);
+            }
+            if (config.chapters[0].id === 'intro') {
+                activateIntroEffects();
             }
 
             scroller
@@ -451,6 +554,7 @@
 
                     if (config.showMarkers) marker.setLngLat(chapter.location.center);
                     if (chapter.onChapterEnter.length > 0) chapter.onChapterEnter.forEach(setLayerOpacity);
+                    if (chapter.id === 'intro') activateIntroEffects();
                     if (chapter.callback) window[chapter.callback]();
                     if (chapter.rotateAnimation) {
                         map.once('moveend', () => {
@@ -472,6 +576,7 @@
                     var chapter = config.chapters.find(chap => chap.id === response.element.id);
                     response.element.classList.remove('active');
                     if (chapter.onChapterExit.length > 0) chapter.onChapterExit.forEach(setLayerOpacity);
+                    if (chapter.id === 'intro') deactivateIntroEffects();
                 });
 
             if (config.auto) {
