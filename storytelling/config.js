@@ -197,7 +197,7 @@ var config = {
       title: "Karl-Marx-Allee",
       // image: './assets/karl-marx-allee.jpg',
       description:
-        'Die <b>Karl-Marx-Allee</b> beginnt als Inszenierung. 1949 als „Stalinallee“ angelegt, sollte sie die Macht und Überlegenheit des Sozialismus sichtbar machen – in überdimensionierten Achsen und palastartigen Wohnbauten. Doch schon wenige Jahre später kippt die sozialistische Erzählung: Am 17. Juni 1953 wird sie zum Schauplatz des Protests: Bauarbeiter legten die Arbeit nieder, und aus dem Vorzeigeboulevard wurde der Ausgangspunkt des Aufstands.',
+        'Die <b>Karl-Marx-Allee</b> beginnt als Inszenierung. 1949 als „Stalinallee“ angelegt, sollte sie die Macht und Überlegenheit des Sozialismus sichtbar machen – in überdimensionierten Achsen und palastartigen Wohnbauten. Doch schon wenige Jahre später kippt die sozialistische Erzählung: Am 17. Juni 1953 wird sie zum Schauplatz des Protests: Bauarbeiter legten die Arbeit nieder, und aus dem Vorzeigeboulevard wurde der Ausgangspunkt des Aufstands, der wenig später von sowjetischen Truppen und DDR-Sicherheitsorganen gewaltsam niedergeschlagen wurde.',
       location: {
         center: [13.435502, 52.516799],
         zoom: 13.44,
