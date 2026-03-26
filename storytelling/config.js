@@ -303,7 +303,7 @@ var config = {
       title: "Anton-Wilhelm-Amo-Straße",
       // image: './assets/anton-wilhelm-amo.jpg',
       description:
-        "Berlin verhandelt seine Kolonialgeschichte auch im Straßenbild. Besonders im <b>Afrikanischen Viertel</b> tragen viele Namen bis heute die Spuren deutscher Kolonialherrschaft. Seit Jahren stehen sie im Zentrum politischer Auseinandersetzungen. Mit der Umbenennung der <b>Mohrenstraße</b> in <b>Anton-Wilhelm-Amo-Straße</b> wurde ein sichtbares Zeichen gesetzt: weg von kolonialen Zuschreibungen, hin zu einer anderen Form von Erinnerung. 2025 wurde diese Entscheidung juristisch bestätigt.",
+        "Berlin verhandelt seine Kolonialgeschichte auch im Straßenbild. Besonders im <b>Afrikanischen Viertel</b> tragen viele Namen bis heute die Spuren deutscher Kolonialherrschaft. Seit Jahren stehen sie im Zentrum politischer Auseinandersetzungen. Die <b>Anton-Wilhelm-Amo-Straße</b> liegt allerdings nicht dort, sondern in <b>Mitte</b>: Mit der Umbenennung der <b>Mohrenstraße</b> wurde auch hier ein sichtbares Zeichen gesetzt, weg von kolonialen Zuschreibungen hin zu einer anderen Form von Erinnerung.",
       location: {
         center: [13.389372, 52.511953],
         zoom: 14.99,
