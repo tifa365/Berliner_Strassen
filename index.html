@@ -78,12 +78,18 @@
             backdrop-filter: blur(10px);
         }
 
-        .maplibregl-ctrl-attrib.maplibregl-compact .maplibregl-ctrl-attrib-button {
-            display: block;
+        .maplibregl-ctrl-attrib.maplibregl-compact {
+            color: var(--text);
+            padding-right: 0;
         }
 
-        .maplibregl-ctrl-attrib:not(.maplibregl-compact) .maplibregl-ctrl-attrib-inner,
-        .maplibregl-ctrl-attrib.maplibregl-compact.maplibregl-compact-show .maplibregl-ctrl-attrib-inner {
+        .maplibregl-ctrl-attrib.maplibregl-compact .maplibregl-ctrl-attrib-button {
+            display: block;
+            background-color: transparent;
+            filter: invert(1) brightness(1.25);
+        }
+
+        .maplibregl-ctrl-attrib.maplibregl-compact-show .maplibregl-ctrl-attrib-inner {
             display: none !important;
         }
 
