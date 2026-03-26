@@ -1350,7 +1350,7 @@
         }
 
         function getChapterCameraOptions(chapter) {
-            if (isIntroVisualChapter(chapter) || chapter.fitToStreetBounds === false) {
+            if (isIntroVisualChapter(chapter)) {
                 return Object.assign({}, chapter.location);
             }
 
