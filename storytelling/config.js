@@ -130,10 +130,7 @@ var config = {
         {
           layer: "eiergasse",
           opacity: 1,
-          duration: 2400,
-          color: "#e74c3c",
-          highlightOpacity: 1,
-          highlightWidth: 9,
+          duration: 5000,
         },
         {
           layer: "satellite-imagery",
@@ -195,14 +192,15 @@ var config = {
     {
       id: "karl-marx-allee",
       alignment: "left",
+      fitToStreetBounds: false,
       hidden: false,
       title: "Karl-Marx-Allee",
       // image: './assets/karl-marx-allee.jpg',
       description:
         'Die <b>Karl-Marx-Allee</b> ist Berlins ambivalentestes Straßendenkmal. Als „Stalinallee" 1949 angelegt, war sie der sozialistische Schaufensterboulevard der DDR – breit genug für Panzer, flankiert von monumentalen Wohnpalästen im Zuckerbäckerstil. 1961 umbenannt, als Stalins Kult auch im Osten bröckelte. Heute steht sie unter Denkmalschutz: nicht wegen des Namens, sondern wegen der Architektur. Am 17. Juni 1953 marschierten hier streikende Bauarbeiter – die Straße, die den Sozialismus verkörpern sollte, war Ausgangspunkt des Volksaufstands.',
       location: {
-        center: [13.438, 52.517],
-        zoom: 13,
+        center: [13.169537, 52.498046],
+        zoom: 10.54,
         pitch: 20,
         bearing: 0,
       },

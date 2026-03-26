@@ -479,6 +479,7 @@
         var streetNamesByLayer = {};
         var streetBoundsByLayer = {};
         var highlightedStreetNameSet = new Set();
+        var pruneStreetBranchNameSet = new Set(['Adlergestell']);
         var currentChapterIndex = 0;
         var isMapEditMode = false;
         var hasInitializedFirstChapter = false;
@@ -486,8 +487,10 @@
         var pendingStreetHighlightTimer = null;
         var activeStreetHighlightChapterId = null;
         var activeStreetHighlightStartedAt = 0;
+        var pendingStreetApplyFrame = null;
         var highlightStreetLayerConfigs = [];
         var highlightLayersReady = false;
+        var prefetchedTileUrlSet = new Set();
         var satelliteDataReady = false;
         var satelliteDataPromise = null;
         var streetDataReady = false;
@@ -627,10 +630,38 @@
             });
         }
 
+        function primeStreetHighlightItems(chapterItems) {
+            chapterItems.forEach(function (item) {
+                var layerId = item.layer;
+                var glowLayerId = streetGlowLayerIds[layerId];
+                if (!map.getLayer(layerId)) return;
+
+                map.setPaintProperty(layerId, 'line-color-transition', { duration: 0 });
+                map.setPaintProperty(layerId, 'line-opacity-transition', { duration: 0 });
+                map.setPaintProperty(layerId, 'line-width-transition', { duration: 0 });
+                map.setPaintProperty(layerId, 'line-color', '#ffffff');
+                map.setPaintProperty(layerId, 'line-opacity', 0);
+                map.setPaintProperty(layerId, 'line-width', 4);
+
+                if (glowLayerId && map.getLayer(glowLayerId)) {
+                    map.setPaintProperty(glowLayerId, 'line-color-transition', { duration: 0 });
+                    map.setPaintProperty(glowLayerId, 'line-opacity-transition', { duration: 0 });
+                    map.setPaintProperty(glowLayerId, 'line-width-transition', { duration: 0 });
+                    map.setPaintProperty(glowLayerId, 'line-color', item.color || streetHighlightColors[layerId]);
+                    map.setPaintProperty(glowLayerId, 'line-opacity', 0);
+                    map.setPaintProperty(glowLayerId, 'line-width', 8);
+                }
+            });
+        }
+
         function clearPendingStreetHighlight() {
             if (pendingStreetHighlightTimer) {
                 window.clearTimeout(pendingStreetHighlightTimer);
                 pendingStreetHighlightTimer = null;
+            }
+            if (pendingStreetApplyFrame) {
+                window.cancelAnimationFrame(pendingStreetApplyFrame);
+                pendingStreetApplyFrame = null;
             }
         }
 
@@ -663,7 +694,14 @@
                 return;
             }
 
-            applyChapterLayerState(getStreetHighlightItems(chapter.onChapterEnter || []), true);
+            var streetItems = getStreetHighlightItems(chapter.onChapterEnter || []);
+            primeStreetHighlightItems(streetItems);
+            pendingStreetApplyFrame = window.requestAnimationFrame(function () {
+                pendingStreetApplyFrame = window.requestAnimationFrame(function () {
+                    pendingStreetApplyFrame = null;
+                    applyChapterLayerState(streetItems, true);
+                });
+            });
             activeStreetHighlightChapterId = chapterId;
             activeStreetHighlightStartedAt = Date.now();
             pendingStreetHighlightChapterId = null;
@@ -795,6 +833,10 @@
             return kept;
         }
 
+        function shouldPruneStreetBranches(streetName) {
+            return pruneStreetBranchNameSet.has(streetName);
+        }
+
         function buildHighlightStreetGeojson(geojson) {
             var cloned = {};
             var grouped = {};
@@ -817,7 +859,11 @@
             cloned.features = [];
 
             Object.keys(grouped).forEach(function (streetName) {
-                cloned.features = cloned.features.concat(pruneStreetBranchFeatures(grouped[streetName]));
+                cloned.features = cloned.features.concat(
+                    shouldPruneStreetBranches(streetName)
+                        ? pruneStreetBranchFeatures(grouped[streetName])
+                        : grouped[streetName]
+                );
             });
 
             return cloned;
@@ -833,6 +879,18 @@
             return (chapter.onChapterEnter || []).some(function (item) {
                 return item.layer === 'satellite-imagery';
             });
+        }
+
+        function getSatelliteInsertBeforeId() {
+            if (map.getLayer('all-streets-context-thin')) return 'all-streets-context-thin';
+
+            for (var i = 0; i < highlightStreetLayerConfigs.length; i += 1) {
+                if (map.getLayer(highlightStreetLayerConfigs[i].id)) {
+                    return highlightStreetLayerConfigs[i].id;
+                }
+            }
+
+            return undefined;
         }
 
         function ensureSatelliteReady() {
@@ -855,7 +913,7 @@
                         type: 'raster',
                         source: 'satellite',
                         paint: { 'raster-opacity': 0 }
-                    });
+                    }, getSatelliteInsertBeforeId());
                 }
 
                 satelliteDataReady = true;
@@ -994,6 +1052,99 @@
                 window.requestIdleCallback(startPreload, { timeout: 1500 });
             } else {
                 window.setTimeout(startPreload, 450);
+            }
+        }
+
+        function lngLatToWorldPixel(lng, lat, z) {
+            var scale = 256 * Math.pow(2, z);
+            var sinLat = Math.sin(lat * Math.PI / 180);
+            var x = (lng + 180) / 360 * scale;
+            var y = (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * scale;
+            return { x: x, y: y };
+        }
+
+        function normalizeTileX(x, z) {
+            var worldSize = Math.pow(2, z);
+            return ((x % worldSize) + worldSize) % worldSize;
+        }
+
+        function buildRasterTileUrl(template, z, x, y) {
+            return template
+                .replace('{z}', String(z))
+                .replace('{x}', String(x))
+                .replace('{y}', String(y));
+        }
+
+        function getChapterPrefetchZoomLevels(chapter) {
+            var base = chapter.location.zoom + 1;
+            var levels = [Math.floor(base), Math.ceil(base)];
+            return levels.filter(function (value, index, list) {
+                return value >= 0 && value <= 22 && list.indexOf(value) === index;
+            });
+        }
+
+        function getChapterPrefetchTileUrls(chapter, template) {
+            if (!map || !map.getCanvas()) return [];
+
+            var canvas = map.getCanvas();
+            var dpr = window.devicePixelRatio || 1;
+            var width = (canvas.clientWidth || window.innerWidth) * dpr;
+            var height = (canvas.clientHeight || window.innerHeight) * dpr;
+            var padding = getChapterPadding(chapter);
+            var left = (padding.left || 0) * dpr;
+            var right = (padding.right || 0) * dpr;
+            var top = (padding.top || 0) * dpr;
+            var bottom = (padding.bottom || 0) * dpr;
+            var screenCenterX = width / 2 + (left - right) / 2;
+            var screenCenterY = height / 2 + (top - bottom) / 2;
+            var margin = 384;
+            var urls = [];
+
+            getChapterPrefetchZoomLevels(chapter).forEach(function (z) {
+                var center = lngLatToWorldPixel(chapter.location.center[0], chapter.location.center[1], z);
+                var minPixelX = center.x - screenCenterX - margin;
+                var maxPixelX = center.x + (width - screenCenterX) + margin;
+                var minPixelY = center.y - screenCenterY - margin;
+                var maxPixelY = center.y + (height - screenCenterY) + margin;
+                var tileMinX = Math.floor(minPixelX / 256);
+                var tileMaxX = Math.floor(maxPixelX / 256);
+                var tileMinY = Math.max(0, Math.floor(minPixelY / 256));
+                var tileMaxY = Math.min(Math.pow(2, z) - 1, Math.floor(maxPixelY / 256));
+
+                for (var tileX = tileMinX; tileX <= tileMaxX; tileX += 1) {
+                    for (var tileY = tileMinY; tileY <= tileMaxY; tileY += 1) {
+                        urls.push(buildRasterTileUrl(template, z, normalizeTileX(tileX, z), tileY));
+                    }
+                }
+            });
+
+            return urls;
+        }
+
+        function prefetchRasterTilesForChapter(chapter, template) {
+            getChapterPrefetchTileUrls(chapter, template).forEach(function (url) {
+                if (prefetchedTileUrlSet.has(url)) return;
+                prefetchedTileUrlSet.add(url);
+                window.fetch(url, { mode: 'no-cors', cache: 'force-cache', credentials: 'omit' }).catch(function () {
+                    prefetchedTileUrlSet.delete(url);
+                });
+            });
+        }
+
+        function prefetchChapterResources(chapter) {
+            if (!chapter) return;
+
+            if (chapterNeedsStreetData(chapter)) {
+                ensureStreetDataReady();
+            }
+
+            prefetchRasterTilesForChapter(chapter, 'https://a.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png');
+
+            if (chapterNeedsSatellite(chapter)) {
+                prefetchRasterTilesForChapter(
+                    chapter,
+                    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+                );
             }
         }
 
@@ -1199,7 +1350,7 @@
         }
 
         function getChapterCameraOptions(chapter) {
-            if (isIntroVisualChapter(chapter)) {
+            if (isIntroVisualChapter(chapter) || chapter.fitToStreetBounds === false) {
                 return Object.assign({}, chapter.location);
             }
 
@@ -1478,6 +1629,7 @@
             }
             syncIntroEffects();
             preloadStreetDataInBackground();
+            prefetchChapterResources(config.chapters[1]);
 
             scroller
                 .setup({
@@ -1525,6 +1677,8 @@
                             document.querySelectorAll('[data-scrollama-index="' + next_chapter + '"]')[0].scrollIntoView();
                         });
                     }
+
+                    prefetchChapterResources(config.chapters[currentChapterIndex + 1]);
                 })
                 .onStepProgress(response => {
                     var chapter = config.chapters.find(chap => chap.id === response.element.id);
