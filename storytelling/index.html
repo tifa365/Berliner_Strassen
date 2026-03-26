@@ -1121,6 +1121,10 @@
             }
         }
 
+        function isIntroVisualChapter(chapter) {
+            return chapter && (chapter.id === 'intro' || chapter.id === 'dna-der-stadt');
+        }
+
         function activateIntroEffects() {
             document.body.classList.add('intro-active');
             setIntroRoadPalette(true);
@@ -1129,6 +1133,15 @@
         function deactivateIntroEffects() {
             document.body.classList.remove('intro-active');
             setIntroRoadPalette(false);
+        }
+
+        function syncIntroEffects() {
+            var chapter = config.chapters[currentChapterIndex];
+            if (isIntroVisualChapter(chapter)) {
+                activateIntroEffects();
+            } else {
+                deactivateIntroEffects();
+            }
         }
 
         function setTopbarVisibility(visible) {
@@ -1168,7 +1181,7 @@
                 return { top: 110, right: 16, bottom: 32, left: 16 };
             }
 
-            if (chapter.id === 'intro') {
+            if (isIntroVisualChapter(chapter)) {
                 return { top: 0, right: 0, bottom: 0, left: 0 };
             }
 
@@ -1186,7 +1199,7 @@
         }
 
         function getChapterCameraOptions(chapter) {
-            if (chapter.id === 'intro') {
+            if (isIntroVisualChapter(chapter)) {
                 return Object.assign({}, chapter.location);
             }
 
@@ -1463,9 +1476,7 @@
             if (config.chapters[0].onChapterEnter.length > 0) {
                 applyChapterLayerState(config.chapters[0].onChapterEnter, true);
             }
-            if (config.chapters[0].id === 'intro') {
-                activateIntroEffects();
-            }
+            syncIntroEffects();
             preloadStreetDataInBackground();
 
             scroller
@@ -1497,7 +1508,7 @@
                         applyChapterLayerState(getNonStreetHighlightItems(chapter.onChapterEnter), true);
                         scheduleStreetHighlightStart(chapter);
                     }
-                    if (chapter.id === 'intro') activateIntroEffects();
+                    syncIntroEffects();
                     if (chapter.callback) window[chapter.callback]();
                     if (chapter.rotateAnimation) {
                         map.once('moveend', () => {
@@ -1531,7 +1542,7 @@
                         activeStreetHighlightChapterId = null;
                     }
                     if (chapter.onChapterExit.length > 0) applyChapterLayerState(chapter.onChapterExit, false);
-                    if (chapter.id === 'intro') deactivateIntroEffects();
+                    syncIntroEffects();
                 });
 
             if (config.auto) {

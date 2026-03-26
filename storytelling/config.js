@@ -130,7 +130,10 @@ var config = {
         {
           layer: "eiergasse",
           opacity: 1,
-          duration: 5000,
+          duration: 2400,
+          color: "#e74c3c",
+          highlightOpacity: 1,
+          highlightWidth: 9,
         },
         {
           layer: "satellite-imagery",
