@@ -167,7 +167,7 @@ var config = {
       title: "Sonnenallee",
       // image: './assets/sonnenallee.jpg',
       description:
-        "Die <b>Sonnenallee</b> gehört zu den berühmtesten Straßen Berlins – nicht nur wegen des gleichnamigen Films über jenen kurzen Abschnitt, der in der DDR lag. Das Partyvolk fand und findet hier angesagte Locations, die vielen kleinen Lebensmittelgeschäfte erfüllen auch außergewöhnliche Wünsche. Vom Hermannplatz bis zum Baumschulenweg sind es knapp fünf Kilometer.",
+        "Die <b>Sonnenallee</b> in Neukölln zählt zu den bekanntesten Straßen Berlins – nicht nur wegen des Films, der den Straßennamen im Titel trägt. Auf knapp fünf Kilometern bündelt sie eine ungewöhnliche Dichte an Berliner Geschichte: das schnelle Wachstum der Mietskasernenstadt um 1900, die ideologische Umbenennung im Nationalsozialismus, die Teilung der Stadt durch die Mauer und die Veränderungen der Nachwendezeit. Heute steht die Sonnenallee für einen migrantisch geprägten Alltag. Bäckereien, Gemüseläden, Imbisse und Geschäfte machen sie zu einer Versorgungsader weit über Neukölln hinaus.",
       location: {
         center: [13.459518, 52.471513],
         zoom: 12.81,
