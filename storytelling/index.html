@@ -314,7 +314,7 @@
 
         .card p {
             color: var(--text);
-            font-size: clamp(15px, 1.18vw, 18px);
+            font-size: clamp(16px, 1.28vw, 19px);
             line-height: 1.38;
             text-align: left;
         }
@@ -400,7 +400,7 @@
             }
 
             .card p {
-                font-size: clamp(16px, 4.9vw, 22px);
+                font-size: clamp(17px, 5.1vw, 23px);
             }
 
             #footer {
@@ -479,7 +479,11 @@
         var streetNamesByLayer = {};
         var streetBoundsByLayer = {};
         var highlightedStreetNameSet = new Set();
-        var pruneStreetBranchNameSet = new Set(['Adlergestell']);
+        var pruneStreetBranchNameSet = new Set(['Adlergestell', 'Karl-Marx-Allee']);
+        var pruneStreetBranchMaxLengthByName = {
+            'Adlergestell': 90,
+            'Karl-Marx-Allee': 120
+        };
         var currentChapterIndex = 0;
         var isMapEditMode = false;
         var hasInitializedFirstChapter = false;
@@ -588,12 +592,12 @@
             if (glowLayerId && map.getLayer(glowLayerId)) {
                 map.setPaintProperty(glowLayerId, 'line-color', targetColor);
                 map.setPaintProperty(glowLayerId, 'line-opacity', glowOpacity);
-                map.setPaintProperty(glowLayerId, 'line-width', 8 + 4 * glowWidthMix);
+                map.setPaintProperty(glowLayerId, 'line-width', 7 + 3 * glowWidthMix);
             }
 
             map.setPaintProperty(layerId, 'line-color', mixColors('#ffffff', targetColor, colorMix));
             map.setPaintProperty(layerId, 'line-opacity', coreOpacity);
-            map.setPaintProperty(layerId, 'line-width', 4 + 2 * widthMix);
+            map.setPaintProperty(layerId, 'line-width', 3.4 + 1.6 * widthMix);
         }
 
         function setStreetHighlightFadeFactor(layerId, factor) {
@@ -641,7 +645,7 @@
                 map.setPaintProperty(layerId, 'line-width-transition', { duration: 0 });
                 map.setPaintProperty(layerId, 'line-color', '#ffffff');
                 map.setPaintProperty(layerId, 'line-opacity', 0);
-                map.setPaintProperty(layerId, 'line-width', 4);
+                map.setPaintProperty(layerId, 'line-width', 3.4);
 
                 if (glowLayerId && map.getLayer(glowLayerId)) {
                     map.setPaintProperty(glowLayerId, 'line-color-transition', { duration: 0 });
@@ -649,7 +653,7 @@
                     map.setPaintProperty(glowLayerId, 'line-width-transition', { duration: 0 });
                     map.setPaintProperty(glowLayerId, 'line-color', item.color || streetHighlightColors[layerId]);
                     map.setPaintProperty(glowLayerId, 'line-opacity', 0);
-                    map.setPaintProperty(glowLayerId, 'line-width', 8);
+                    map.setPaintProperty(glowLayerId, 'line-width', 7);
                 }
             });
         }
@@ -786,7 +790,7 @@
             return trimmed;
         }
 
-        function pruneStreetBranchFeatures(features) {
+        function pruneStreetBranchFeatures(features, maxLeafLengthMeters) {
             if (features.length <= 1) return features.slice();
 
             var kept = features.slice();
@@ -816,7 +820,7 @@
                     var startKey = endpointKey(coords[0]);
                     var endKey = endpointKey(coords[coords.length - 1]);
                     var isLeaf = (degrees[startKey] === 1 || degrees[endKey] === 1);
-                    var isShort = (feature.properties && feature.properties.__segment_length_m || 0) < 90;
+                    var isShort = (feature.properties && feature.properties.__segment_length_m || 0) < maxLeafLengthMeters;
 
                     if (isLeaf && isShort && kept.length > 1) {
                         changed = true;
@@ -835,6 +839,10 @@
 
         function shouldPruneStreetBranches(streetName) {
             return pruneStreetBranchNameSet.has(streetName);
+        }
+
+        function getPruneStreetBranchMaxLength(streetName) {
+            return pruneStreetBranchMaxLengthByName[streetName] || 90;
         }
 
         function buildHighlightStreetGeojson(geojson) {
@@ -861,7 +869,7 @@
             Object.keys(grouped).forEach(function (streetName) {
                 cloned.features = cloned.features.concat(
                     shouldPruneStreetBranches(streetName)
-                        ? pruneStreetBranchFeatures(grouped[streetName])
+                        ? pruneStreetBranchFeatures(grouped[streetName], getPruneStreetBranchMaxLength(streetName))
                         : grouped[streetName]
                 );
             });
@@ -1189,7 +1197,7 @@
                     : (layer.opacity > 0 ? 1 : layer.opacity);
                 var highlightWidth = layer.highlightWidth != null
                     ? layer.highlightWidth
-                    : (layer.opacity > 0 ? 6 : 4);
+                    : (layer.opacity > 0 ? 5 : 3.4);
                 var opacityDuration = layer.opacity > 0 ? Math.min(layer.duration || 5000, 5000) : 500;
                 var colorDuration = layer.opacity > 0 ? 3200 : 400;
                 var widthDuration = layer.opacity > 0 ? 1400 : 320;
@@ -1591,10 +1599,10 @@
                     color: '#e74c3c'
                 },
                 {
-                    // No address count in Berlin WFS — placeholder until address data is available
                     id: 'geister-strassen',
-                    filter: ['boolean', false],
-                    color: '#95a5a6'
+                    filter: ['==', ['get', 'strname'], 'Tunnel Tiergarten Spreebogen'],
+                    streetNames: ['Tunnel Tiergarten Spreebogen'],
+                    color: '#e74c3c'
                 },
                 {
                     // Mohrenstraße was renamed to Anton-Wilhelm-Amo-Straße (OVG ruling 9 July 2025).

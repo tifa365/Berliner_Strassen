@@ -164,7 +164,7 @@ var config = {
       title: "Sonnenallee",
       // image: './assets/sonnenallee.jpg',
       description:
-        "Die <b>Sonnenallee</b> in Neukölln zählt zu den bekanntesten Straßen Berlins – nicht nur wegen des Films, der den Straßennamen im Titel trägt. Auf knapp fünf Kilometern bündelt sie eine ungewöhnliche Dichte an Berliner Geschichte: das schnelle Wachstum der Mietskasernenstadt um 1900, die ideologische Umbenennung im Nationalsozialismus, die Teilung der Stadt durch die Mauer und die Veränderungen der Nachwendezeit. Heute steht die Sonnenallee für einen migrantisch geprägten Alltag. Bäckereien, Gemüseläden, Imbisse und Geschäfte machen sie zu einer Versorgungsader weit über Neukölln hinaus.",
+        "Die <b>Sonnenallee</b> in Neukölln zählt zu den bekanntesten Straßen Berlins – nicht nur wegen des Films, der den Straßennamen im Titel trägt. Auf knapp fünf Kilometern bündelt sie eine ungewöhnliche Dichte an Berliner Geschichte: das schnelle Wachstum der Mietskasernenstadt um 1900, die ideologische Umbenennung im Nationalsozialismus, die Teilung der Stadt durch die Mauer und die Veränderungen der Nachwendezeit.",
       location: {
         center: [13.459518, 52.471513],
         zoom: 12.81,
@@ -197,10 +197,10 @@ var config = {
       title: "Karl-Marx-Allee",
       // image: './assets/karl-marx-allee.jpg',
       description:
-        'Die <b>Karl-Marx-Allee</b> ist Berlins ambivalentestes Straßendenkmal. Als „Stalinallee" 1949 angelegt, war sie der sozialistische Schaufensterboulevard der DDR – breit genug für Panzer, flankiert von monumentalen Wohnpalästen im Zuckerbäckerstil. 1961 umbenannt, als Stalins Kult auch im Osten bröckelte. Heute steht sie unter Denkmalschutz: nicht wegen des Namens, sondern wegen der Architektur. Am 17. Juni 1953 marschierten hier streikende Bauarbeiter – die Straße, die den Sozialismus verkörpern sollte, war Ausgangspunkt des Volksaufstands.',
+        'Die <b>Karl-Marx-Allee</b> beginnt als Inszenierung. 1949 als „Stalinallee“ angelegt, sollte sie die Macht und Überlegenheit des Sozialismus sichtbar machen – in überdimensionierten Achsen und palastartigen Wohnbauten. Doch schon wenige Jahre später kippt die sozialistische Erzählung: Am 17. Juni 1953 wird sie zum Schauplatz des Protests: Bauarbeiter legten die Arbeit nieder, und aus dem Vorzeigeboulevard wurde der Ausgangspunkt des Aufstands.',
       location: {
-        center: [13.169537, 52.498046],
-        zoom: 10.54,
+        center: [13.435502, 52.516799],
+        zoom: 13.44,
         pitch: 20,
         bearing: 0,
       },
@@ -266,21 +266,34 @@ var config = {
     {
       id: "geister-strassen",
       alignment: "center",
+      fitToStreetBounds: false,
       hidden: false,
       title: '"Geisterhafte" Straßennamen',
       description:
-        "Auch Berlin kennt Straßen, die auf keinem Briefumschlag landen. Manchmal sind es Wege, die nur der Infrastruktur dienen – Zufahrten, Brücken, Tunnel. Manchmal sind es Relikte der Teilung: Straßen, die in West- und Ostberlin doppelt existierten und nach der Wende zwischen den Verwaltungen verschwanden. Irgendwie schade, dass sie nie das Privileg haben, auf einem Briefumschlag zu stehen.",
+        "Auch Berlin kennt Straßen, die auf keinem Briefumschlag landen. Manchmal sind es Wege, die nur der Infrastruktur dienen – Zufahrten, Brücken, Tunnel. Manchmal sind es Relikte der Teilung: Straßen, die in West- und Ostberlin doppelt existierten und nach der Wende zwischen den Verwaltungen verschwanden. Irgendwie schade, dass sie nie das Privileg haben, auf einem Briefumschlag zu stehen. Ein gutes Beispiel ist der <b>Tunnel Tiergarten Spreebogen</b>.",
       location: {
-        center: [13.405, 52.52],
-        zoom: 10.5,
+        center: [13.375556, 52.513825],
+        zoom: 12.73,
         pitch: 20,
         bearing: 0,
       },
       mapAnimation: "flyTo",
       rotateAnimation: false,
       callback: "",
-      onChapterEnter: [],
-      onChapterExit: [],
+      onChapterEnter: [
+        {
+          layer: "geister-strassen",
+          opacity: 1,
+          duration: 5000,
+        },
+      ],
+      onChapterExit: [
+        {
+          layer: "geister-strassen",
+          opacity: 0,
+          duration: 5000,
+        },
+      ],
     },
     {
       id: "anton-wilhelm-amo-strasse",
@@ -289,7 +302,7 @@ var config = {
       title: "Anton-Wilhelm-Amo-Straße",
       // image: './assets/anton-wilhelm-amo.jpg',
       description:
-        "Straßennamen als Erinnerungskampf: Für Berlin passt besonders gut die Schicht aus NS-, DDR- und kolonialen Umbenennungen. Offiziell wird in Mitte ausdrücklich auf problematische NS- und DDR-Bezüge verwiesen; im <b>Afrikanischen Viertel</b> nennt der Bezirk konkrete Umbenennungen wie Nachtigalplatz, Lüderitzstraße, Petersallee und Mohrenstraße. Für letztere entschied das OVG am 9. Juli 2025, dass die Umbenennung in <b>Anton-Wilhelm-Amo-Straße</b> rechtmäßig ist. Anton Wilhelm Amo war ein Philosoph aus dem heutigen Ghana, der im 18. Jahrhundert in Deutschland lehrte – einer der ersten Schwarzen Akademiker Europas.",
+        "Berlin verhandelt seine Kolonialgeschichte auch im Straßenbild. Besonders im <b>Afrikanischen Viertel</b> tragen viele Namen bis heute die Spuren deutscher Kolonialherrschaft. Seit Jahren stehen sie im Zentrum politischer Auseinandersetzungen. Mit der Umbenennung der <b>Mohrenstraße</b> in <b>Anton-Wilhelm-Amo-Straße</b> wurde ein sichtbares Zeichen gesetzt: weg von kolonialen Zuschreibungen, hin zu einer anderen Form von Erinnerung. 2025 wurde diese Entscheidung juristisch bestätigt.",
       location: {
         center: [13.386, 52.511],
         zoom: 15.5,
