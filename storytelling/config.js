@@ -298,14 +298,15 @@ var config = {
     {
       id: "anton-wilhelm-amo-strasse",
       alignment: "right",
+      fitToStreetBounds: false,
       hidden: false,
       title: "Anton-Wilhelm-Amo-Straße",
       // image: './assets/anton-wilhelm-amo.jpg',
       description:
         "Berlin verhandelt seine Kolonialgeschichte auch im Straßenbild. Besonders im <b>Afrikanischen Viertel</b> tragen viele Namen bis heute die Spuren deutscher Kolonialherrschaft. Seit Jahren stehen sie im Zentrum politischer Auseinandersetzungen. Mit der Umbenennung der <b>Mohrenstraße</b> in <b>Anton-Wilhelm-Amo-Straße</b> wurde ein sichtbares Zeichen gesetzt: weg von kolonialen Zuschreibungen, hin zu einer anderen Form von Erinnerung. 2025 wurde diese Entscheidung juristisch bestätigt.",
       location: {
-        center: [13.386, 52.511],
-        zoom: 15.5,
+        center: [13.389372, 52.511953],
+        zoom: 14.99,
         pitch: 20,
         bearing: 0,
       },
@@ -343,7 +344,7 @@ var config = {
       hidden: false,
       title: "",
       description:
-        "Ein aktuelles Thema ist auch die deutliche Unterrepräsentation von Frauen bei Straßennamen. Von den rund 14.000 Straßennamen Berlins tragen weniger als zehn Prozent weibliche Vornamen. Neuere Benennungen versuchen, dieses Ungleichgewicht langsam zu korrigieren – auch in Berlin gibt es entsprechende Initiativen und Vorgaben für Neubenennungen.",
+        "Ein aktuelles Thema ist auch die deutliche Unterrepräsentation von Frauen bei Straßennamen. Von den rund 14.000 Straßennamen Berlins tragen weniger als zehn Prozent weibliche Vornamen. Auf der Karte sind nach männlichen Vornamen benannte Straßen hell, nach weiblichen rot markiert. Neuere Benennungen versuchen, dieses Ungleichgewicht langsam zu korrigieren – auch in Berlin gibt es entsprechende Initiativen und Vorgaben für Neubenennungen.",
       location: {
         center: [13.405, 52.52],
         zoom: 10.5,
@@ -353,8 +354,30 @@ var config = {
       mapAnimation: "flyTo",
       rotateAnimation: false,
       callback: "",
-      onChapterEnter: [],
-      onChapterExit: [],
+      onChapterEnter: [
+        {
+          layer: "male-streets",
+          opacity: 0.24,
+          duration: 1200,
+        },
+        {
+          layer: "female-streets",
+          opacity: 0.92,
+          duration: 1200,
+        },
+      ],
+      onChapterExit: [
+        {
+          layer: "male-streets",
+          opacity: 0,
+          duration: 500,
+        },
+        {
+          layer: "female-streets",
+          opacity: 0,
+          duration: 500,
+        },
+      ],
     },
     {
       id: "ende",

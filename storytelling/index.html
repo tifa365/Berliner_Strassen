@@ -499,6 +499,43 @@
         var satelliteDataPromise = null;
         var streetDataReady = false;
         var streetDataPromise = null;
+        var femaleStreetLayerId = 'female-streets';
+        var maleStreetLayerId = 'male-streets';
+        var femaleStreetSourceId = 'female-streets-source';
+        var maleStreetSourceId = 'male-streets-source';
+        var excludedGenderStreetNamePattern = /^(?:\d|A\s?\d|\d{2,})|\b(?:AS|AD|Einf|Ausf)\b|Hauptfahrbahn|Verbfb/i;
+        var femaleStreetNameParts = new Set([
+            'Adelheid', 'Alice', 'Amalie', 'Anna', 'Antonie', 'Auguste', 'Babette', 'Bella', 'Berta', 'Bertha',
+            'Bettina', 'Betty', 'Cauer', 'Charlotte', 'Christine', 'Clara', 'Dorothea', 'Elfriede', 'Elisabeth',
+            'Elsa', 'Else', 'Emma', 'Eva', 'Flora', 'Frieda', 'Friede', 'Gertrud', 'Gertrude', 'Gisela', 'Grete',
+            'Gretel', 'Hanna', 'Hannah', 'Hedwig', 'Helene', 'Henriette', 'Hermine', 'Hilde', 'Hildegard', 'Ida',
+            'Ilse', 'Inge', 'Ingeborg', 'Irma', 'Irmgard', 'Johanna', 'Josephine', 'Julia', 'Juliane', 'Karoline',
+            'Katharina', 'Klara', 'Kollwitz', 'Käte', 'Käthe', 'Lange', 'Lena', 'Leonore', 'Leopoldine', 'Lina',
+            'Lisa', 'Lisbeth', 'Lotte', 'Louise', 'Luise', 'Luxemburg', 'Magdalena', 'Margarete', 'Margarethe',
+            'Maria', 'Marie', 'Marlene', 'Marta', 'Martha', 'Mathilde', 'Minna', 'Monika', 'Nelly', 'Ottilie',
+            'Paula', 'Pauline', 'Rahel', 'Regine', 'Renate', 'Rita', 'Rosa', 'Rosalie', 'Sibylle', 'Sidonie',
+            'Sofie', 'Sophie', 'Susanne', 'Thea', 'Thekla', 'Theresia', 'Trude', 'Trudi', 'Ulrike', 'Ursula',
+            'Veronika', 'Viktoria', 'Viola', 'Walburga', 'Wally', 'Walpurga', 'Wanda', 'Wilhelmine', 'Yvonne',
+            'Zetkin'
+        ]);
+        var maleStreetNameParts = new Set([
+            'Adalbert', 'Albert', 'Albrecht', 'Alexander', 'Alfred', 'Alois', 'Andreas', 'Anton', 'August', 'Axel',
+            'Benno', 'Bernhard', 'Bruno', 'Carl', 'Caspar', 'Christian', 'Christoph', 'Conrad', 'Daniel', 'David',
+            'Dietrich', 'Eduard', 'Emanuel', 'Emil', 'Erich', 'Ernst', 'Eugen', 'Felix', 'Ferdinand', 'Franz',
+            'Friedrich', 'Fritz', 'Georg', 'Gerhard', 'Gottfried', 'Gustav', 'Hans', 'Heinrich', 'Helmuth',
+            'Hermann', 'Jakob', 'Joachim', 'Johann', 'Johannes', 'Josef', 'Julius', 'Karl', 'Konrad', 'Kurt', 'Leo',
+            'Leopold', 'Ludwig', 'Magnus', 'Martin', 'Matthias', 'Max', 'Michael', 'Moritz', 'Nikolaus', 'Norbert',
+            'Otto', 'Paul', 'Peter', 'Philipp', 'Richard', 'Robert', 'Rudolf', 'Samuel', 'Sebastian', 'Sigmund',
+            'Stefan', 'Theodor', 'Thomas', 'Ulrich', 'Victor', 'Viktor', 'Walter', 'Werner', 'Wilhelm', 'Willy',
+            'Wolfgang', 'Adenauer', 'Bebel', 'Behring', 'Bismarck', 'Böckler', 'Brandt', 'Brecht', 'Curie',
+            'Diesel', 'Dohm', 'Dürer', 'Ebert', 'Einstein', 'Eisler', 'Engels', 'Fontane', 'Forster', 'Freud',
+            'Gaulle', 'Gauss', 'Goethe', 'Gropius', 'Gutenberg', 'Haeckel', 'Händel', 'Heine', 'Helmholtz',
+            'Humboldt', 'Jahn', 'Kant', 'Kepler', 'Kleist', 'Klopstock', 'Körner', 'Lassalle', 'Leibniz',
+            'Liebknecht', 'Lortzing', 'Mann', 'Marx', 'Mendelsohn', 'Menzel', 'Mierendorff', 'Mozart', 'Mühsam',
+            'Müller', 'Nansen', 'Newton', 'Nobel', 'Pestalozzi', 'Planck', 'Raabe', 'Rembrandt', 'Rilke', 'Röntgen',
+            'Scharnhorst', 'Schiller', 'Schinkel', 'Schliemann', 'Schlüter', 'Schumann', 'Siemens', 'Stein',
+            'Stresemann', 'Tucholsky', 'Virchow', 'Wagner', 'Weber', 'Wichert', 'Winckelmann', 'Winkelmann', 'Zola'
+        ]);
 
         function roundNumber(value, digits) {
             return Number(value.toFixed(digits));
@@ -790,6 +827,45 @@
             return trimmed;
         }
 
+        function getGenderStreetNameParts(streetName) {
+            if (!streetName || excludedGenderStreetNamePattern.test(streetName)) return [];
+
+            var cleaned = streetName
+                .replace(
+                    /(straße|strasse|-Str\.|allee|weg|platz|damm|chaussee|ring|gasse|steig|pfad|zeile|promenade|ufer|korso|terrasse|brücke|markt|steg|kai|bogen|tunnel|park|hain)$/i,
+                    ''
+                )
+                .trim()
+                .replace(/-$/, '');
+
+            return cleaned.split(/[-\s/()]+/).filter(Boolean);
+        }
+
+        function classifyStreetGender(streetName) {
+            var parts = getGenderStreetNameParts(streetName);
+            if (!parts.length) return null;
+
+            var hasFemale = parts.some(function (part) {
+                return femaleStreetNameParts.has(part);
+            });
+            var hasMale = parts.some(function (part) {
+                return maleStreetNameParts.has(part);
+            });
+
+            if (hasFemale === hasMale) return null;
+            return hasFemale ? 'female' : 'male';
+        }
+
+        function buildGenderStreetGeojson(geojson, gender) {
+            return {
+                type: 'FeatureCollection',
+                features: (geojson.features || []).filter(function (feature) {
+                    var streetName = feature.properties && feature.properties.strname;
+                    return classifyStreetGender(streetName) === gender;
+                })
+            };
+        }
+
         function pruneStreetBranchFeatures(features, maxLeafLengthMeters) {
             if (features.length <= 1) return features.slice();
 
@@ -879,7 +955,10 @@
 
         function chapterNeedsStreetData(chapter) {
             return (chapter.onChapterEnter || []).some(function (item) {
-                return item.layer === 'all-streets-context-thin' || isStreetHighlightLayer(item.layer);
+                return item.layer === 'all-streets-context-thin' ||
+                    item.layer === femaleStreetLayerId ||
+                    item.layer === maleStreetLayerId ||
+                    isStreetHighlightLayer(item.layer);
             });
         }
 
@@ -968,6 +1047,67 @@
                                     14, 0.45,
                                     16, 0.7,
                                     18, 1.05
+                                ],
+                                'line-opacity': 0
+                            }
+                        });
+                    }
+
+                    var femaleStreetGeojson = buildGenderStreetGeojson(geojson, 'female');
+                    var maleStreetGeojson = buildGenderStreetGeojson(geojson, 'male');
+
+                    if (map.getSource(maleStreetSourceId)) {
+                        map.getSource(maleStreetSourceId).setData(maleStreetGeojson);
+                    } else {
+                        map.addSource(maleStreetSourceId, {
+                            type: 'geojson',
+                            data: maleStreetGeojson
+                        });
+
+                        map.addLayer({
+                            id: maleStreetLayerId,
+                            type: 'line',
+                            source: maleStreetSourceId,
+                            layout: {
+                                'line-cap': 'round',
+                                'line-join': 'round'
+                            },
+                            paint: {
+                                'line-color': '#f2efe8',
+                                'line-width': [
+                                    'interpolate', ['linear'], ['zoom'],
+                                    10, 0.32,
+                                    12, 0.48,
+                                    15, 0.8
+                                ],
+                                'line-opacity': 0
+                            }
+                        });
+                    }
+
+                    if (map.getSource(femaleStreetSourceId)) {
+                        map.getSource(femaleStreetSourceId).setData(femaleStreetGeojson);
+                    } else {
+                        map.addSource(femaleStreetSourceId, {
+                            type: 'geojson',
+                            data: femaleStreetGeojson
+                        });
+
+                        map.addLayer({
+                            id: femaleStreetLayerId,
+                            type: 'line',
+                            source: femaleStreetSourceId,
+                            layout: {
+                                'line-cap': 'round',
+                                'line-join': 'round'
+                            },
+                            paint: {
+                                'line-color': '#ff5a5f',
+                                'line-width': [
+                                    'interpolate', ['linear'], ['zoom'],
+                                    10, 0.42,
+                                    12, 0.62,
+                                    15, 1.05
                                 ],
                                 'line-opacity': 0
                             }
