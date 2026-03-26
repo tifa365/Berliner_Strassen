@@ -70,10 +70,28 @@
             width: 100%;
         }
 
+        #intro-street-overlay {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center center;
+            opacity: 0;
+            transition: opacity 320ms ease;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        body.intro-active #intro-street-overlay {
+            opacity: 0.96;
+        }
+
         .map-overlay {
             pointer-events: none;
             position: absolute;
             inset: 0;
+            z-index: 2;
             background:
                 linear-gradient(90deg, rgba(8, 9, 11, 0.72) 0%, rgba(8, 9, 11, 0.38) 30%, rgba(8, 9, 11, 0) 58%),
                 linear-gradient(0deg, rgba(8, 9, 11, 0.76) 0%, rgba(8, 9, 11, 0) 38%);
@@ -415,6 +433,7 @@
     </div>
     <div id="map-shell">
         <div id="map"></div>
+        <img id="intro-street-overlay" src="./assets/intro-street-network.svg" alt="" />
         <div class="map-overlay"></div>
     </div>
     <div id="story"></div>
@@ -469,6 +488,10 @@
         var activeStreetHighlightStartedAt = 0;
         var highlightStreetLayerConfigs = [];
         var highlightLayersReady = false;
+        var satelliteDataReady = false;
+        var satelliteDataPromise = null;
+        var streetDataReady = false;
+        var streetDataPromise = null;
 
         function roundNumber(value, digits) {
             return Number(value.toFixed(digits));
@@ -800,11 +823,91 @@
             return cloned;
         }
 
-        function loadStreetBoundsIndex() {
-            fetch('./data/strassen_berlin_wgs84.geojson')
+        function chapterNeedsStreetData(chapter) {
+            return (chapter.onChapterEnter || []).some(function (item) {
+                return item.layer === 'all-streets-context-thin' || isStreetHighlightLayer(item.layer);
+            });
+        }
+
+        function chapterNeedsSatellite(chapter) {
+            return (chapter.onChapterEnter || []).some(function (item) {
+                return item.layer === 'satellite-imagery';
+            });
+        }
+
+        function ensureSatelliteReady() {
+            if (satelliteDataReady) return Promise.resolve();
+            if (satelliteDataPromise) return satelliteDataPromise;
+
+            satelliteDataPromise = Promise.resolve().then(function () {
+                if (!map.getSource('satellite')) {
+                    map.addSource('satellite', {
+                        type: 'raster',
+                        tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+                        tileSize: 256,
+                        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                    });
+                }
+
+                if (!map.getLayer('satellite-imagery')) {
+                    map.addLayer({
+                        id: 'satellite-imagery',
+                        type: 'raster',
+                        source: 'satellite',
+                        paint: { 'raster-opacity': 0 }
+                    });
+                }
+
+                satelliteDataReady = true;
+                var activeChapter = config.chapters[currentChapterIndex];
+                if (activeChapter) {
+                    applyChapterLayerState(getNonStreetHighlightItems(activeChapter.onChapterEnter || []), true);
+                }
+            }).catch(function () {
+                satelliteDataPromise = null;
+            });
+
+            return satelliteDataPromise;
+        }
+
+        function ensureStreetDataReady() {
+            if (streetDataReady) return Promise.resolve();
+            if (streetDataPromise) return streetDataPromise;
+
+            streetDataPromise = fetch('./data/strassen_berlin_wgs84.geojson')
                 .then(function (response) { return response.json(); })
                 .then(function (geojson) {
                     if (!geojson.features) return;
+
+                    if (map.getSource('strassen')) {
+                        map.getSource('strassen').setData(geojson);
+                    } else {
+                        map.addSource('strassen', {
+                            type: 'geojson',
+                            data: geojson
+                        });
+
+                        map.addLayer({
+                            id: 'all-streets-context-thin',
+                            type: 'line',
+                            source: 'strassen',
+                            layout: {
+                                'line-cap': 'round',
+                                'line-join': 'round'
+                            },
+                            paint: {
+                                'line-color': '#f2efe8',
+                                'line-width': [
+                                    'interpolate', ['linear'], ['zoom'],
+                                    14, 0.45,
+                                    16, 0.7,
+                                    18, 1.05
+                                ],
+                                'line-opacity': 0
+                            }
+                        });
+                    }
+
                     geojson.features.forEach(function (feature) {
                         var streetName = feature.properties && feature.properties.strname;
                         if (!streetName) return;
@@ -863,14 +966,35 @@
                     }
 
                     highlightLayersReady = true;
+                    streetDataReady = true;
                     var activeChapter = config.chapters[currentChapterIndex];
-                    if (activeChapter && getStreetHighlightItems(activeChapter.onChapterEnter || []).length) {
-                        scheduleStreetHighlightStart(activeChapter);
+                    if (activeChapter) {
+                        applyChapterLayerState(getNonStreetHighlightItems(activeChapter.onChapterEnter || []), true);
+                        if (getStreetHighlightItems(activeChapter.onChapterEnter || []).length) {
+                            scheduleStreetHighlightStart(activeChapter);
+                        }
                     }
                 })
                 .catch(function () {
                     // Fall back to configured chapter locations if bounds loading fails.
+                    streetDataPromise = null;
                 });
+
+            return streetDataPromise;
+        }
+
+        function preloadStreetDataInBackground() {
+            if (streetDataReady || streetDataPromise) return;
+
+            var startPreload = function () {
+                ensureStreetDataReady();
+            };
+
+            if ('requestIdleCallback' in window) {
+                window.requestIdleCallback(startPreload, { timeout: 1500 });
+            } else {
+                window.setTimeout(startPreload, 450);
+            }
         }
 
         function shouldUseStreetBounds(chapter) {
@@ -1263,89 +1387,6 @@
             setMapEditingMode(false);
             tuneBasemap();
 
-            // Satellite raster overlay (Esri World Imagery, free for display use)
-            map.addSource('satellite', {
-                type: 'raster',
-                tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
-                tileSize: 256,
-                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-            });
-            // Satellite imagery overlay used in selected chapters
-            map.addLayer({
-                id: 'satellite-imagery',
-                type: 'raster',
-                source: 'satellite',
-                paint: { 'raster-opacity': 0 }
-            });
-
-            // Local GeoJSON street data
-            map.addSource('strassen', {
-                type: 'geojson',
-                data: './data/strassen_berlin_wgs84.geojson'
-            });
-
-            map.addLayer({
-                id: 'all-streets-overview-case',
-                type: 'line',
-                source: 'strassen',
-                layout: {
-                    'line-cap': 'butt',
-                    'line-join': 'miter'
-                },
-                paint: {
-                    'line-color': 'rgba(255, 255, 255, 0)',
-                    'line-width': [
-                        'interpolate', ['linear'], ['zoom'],
-                        9, 1.1,
-                        10.5, 1.8,
-                        12, 2.8,
-                        14, 4.4
-                    ],
-                    'line-opacity': config.chapters[0].id === 'intro' ? 0 : 0
-                }
-            });
-
-            map.addLayer({
-                id: 'all-streets-overview',
-                type: 'line',
-                source: 'strassen',
-                layout: {
-                    'line-cap': 'butt',
-                    'line-join': 'miter'
-                },
-                paint: {
-                    'line-color': '#ffffff',
-                    'line-width': [
-                        'interpolate', ['linear'], ['zoom'],
-                        9, 1.0,
-                        10.5, 1.8,
-                        12, 2.8,
-                        14, 4.2
-                    ],
-                    'line-opacity': config.chapters[0].id === 'intro' ? 1 : 0
-                }
-            });
-
-            map.addLayer({
-                id: 'all-streets-context-thin',
-                type: 'line',
-                source: 'strassen',
-                layout: {
-                    'line-cap': 'round',
-                    'line-join': 'round'
-                },
-                paint: {
-                    'line-color': '#f2efe8',
-                    'line-width': [
-                        'interpolate', ['linear'], ['zoom'],
-                        14, 0.45,
-                        16, 0.7,
-                        18, 1.05
-                    ],
-                    'line-opacity': 0
-                }
-            });
-
             // Highlight layers — all start invisible, toggled by chapter enter/exit.
             // Field names from the Berlin GeoJSON: strname (street name), bezname (Bezirk).
             var streetLayers = [
@@ -1418,7 +1459,6 @@
             });
 
             highlightStreetLayerConfigs = streetLayers.slice();
-            loadStreetBoundsIndex();
 
             if (config.chapters[0].onChapterEnter.length > 0) {
                 applyChapterLayerState(config.chapters[0].onChapterEnter, true);
@@ -1426,6 +1466,7 @@
             if (config.chapters[0].id === 'intro') {
                 activateIntroEffects();
             }
+            preloadStreetDataInBackground();
 
             scroller
                 .setup({
@@ -1438,6 +1479,14 @@
                     var chapter = config.chapters[currentChapterIndex];
 
                     response.element.classList.add('active');
+                    if (chapterNeedsSatellite(chapter)) {
+                        ensureSatelliteReady();
+                    }
+                    if (currentChapterIndex > 0 && chapterNeedsStreetData(chapter)) {
+                        ensureStreetDataReady();
+                    } else if (currentChapterIndex > 0 && !streetDataReady && !streetDataPromise) {
+                        ensureStreetDataReady();
+                    }
                     var isInitialIntroEntry = !hasInitializedFirstChapter && currentChapterIndex === 0;
                     moveToChapter(chapter, isInitialIntroEntry);
                     hasInitializedFirstChapter = true;

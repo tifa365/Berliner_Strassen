@@ -50,30 +50,8 @@ var config = {
       mapAnimation: "flyTo",
       rotateAnimation: false,
       callback: "",
-      onChapterEnter: [
-        {
-          layer: "all-streets-overview-case",
-          opacity: 0,
-          duration: 1200,
-        },
-        {
-          layer: "all-streets-overview",
-          opacity: 1,
-          duration: 1200,
-        },
-      ],
-      onChapterExit: [
-        {
-          layer: "all-streets-overview-case",
-          opacity: 0,
-          duration: 1200,
-        },
-        {
-          layer: "all-streets-overview",
-          opacity: 0,
-          duration: 1200,
-        },
-      ],
+      onChapterEnter: [],
+      onChapterExit: [],
     },
     {
       id: "dna-der-stadt",
@@ -81,7 +59,7 @@ var config = {
       fitToStreetBounds: false,
       hidden: false,
       description:
-        'Straßennamen beschreiben nicht nur die Orte um uns herum, sondern bilden auch die kollektive DNA einer Stadt. Das gilt nirgends mehr als in Berlin. Hier schichten sich Geschichte auf Geschichte: preußische Königsstraßen, kaiserliche Triumphachsen, nationalsozialistische Umbenennungen, DDR-Prachtboulevards und der anhaltende Kampf um das Erinnern. Man kann sehr lange in Berlin leben, ohne Straßennamen zu kennen. Aber wenn man mit „Einheimischen" spricht, ist man immer wieder beeindruckt, wie fließend sie Orte anhand von Straßennamen beschreiben können.',
+        "Straßennamen beschreiben nicht nur die Orte um uns herum, sondern bilden auch die kollektive DNA einer Stadt. Das gilt besonders in Berlin. Hier ist die deutsche Geschichte auf einzigartige Weise verdichtet: Preußische Königsstraßen, kaiserliche Triumphachsen, nationalsozialistische Umbenennungen, DDR-Prachtboulevards und Spuren des Kolonialismus überlagern sich und zeichnen ein vielschichtiges, oft widersprüchliches Bild. Wer genau hinsieht, kann an ihnen politische Brüche und gesellschaftliche Debatten ablesen.",
       location: {
         center: [13.398058, 52.520545],
         zoom: 10.5,
