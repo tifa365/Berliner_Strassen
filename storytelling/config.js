@@ -32,8 +32,7 @@ var config = {
   auto: false,
   title: "Berlins DNA in Straßennamen",
   byline: "",
-  footer:
-    'Datenquelle: <a href="https://daten.berlin.de/datensaetze/stra%C3%9Fenabschnitte-berlin" target="_blank">Straßenabschnitte RBS Berlin</a> (Amt für Statistik Berlin-Brandenburg, CC-BY-3.0) <br> Created using <a href="https://maplibre.org/maplibre-gl-js/docs/" target="_blank">MapLibre GL JS</a> + <a href="https://github.com/russellsamora/scrollama" target="_blank">Scrollama</a>.<br></br>by Sören Etler | <a href="https://soerenetler.de/de/page/impressum/" target="_blank">Impressum</a>',
+  footer: "",
   chapters: [
     {
       id: "intro",
@@ -303,7 +302,7 @@ var config = {
       title: "Anton-Wilhelm-Amo-Straße",
       // image: './assets/anton-wilhelm-amo.jpg',
       description:
-        "Berlin verhandelt seine Kolonialgeschichte auch im Straßenbild. Besonders im <b>Afrikanischen Viertel</b> tragen viele Namen bis heute die Spuren deutscher Kolonialherrschaft. Seit Jahren stehen sie im Zentrum politischer Auseinandersetzungen. Die <b>Anton-Wilhelm-Amo-Straße</b> liegt allerdings nicht dort, sondern in <b>Mitte</b>: Mit der Umbenennung der <b>Mohrenstraße</b> wurde auch hier ein sichtbares Zeichen gesetzt, weg von kolonialen Zuschreibungen hin zu einer anderen Form von Erinnerung.",
+        "Berlin verhandelt seine Kolonialgeschichte auch im Straßenbild. Besonders im <b>Afrikanischen Viertel</b> tragen viele Namen bis heute die Spuren deutscher Kolonialherrschaft. Seit Jahren stehen sie im Zentrum politischer Auseinandersetzungen. Die <b>Anton-Wilhelm-Amo-Straße</b> liegt allerdings nicht dort, sondern in <b>Mitte</b>: Mit der Umbenennung der <b>Mohrenstraße</b> wurde auch hier ein sichtbares Zeichen gesetzt, weg von kolonialen Zuschreibungen hin zu einer positiven Form von Erinnerung.",
       location: {
         center: [13.389372, 52.511953],
         zoom: 14.99,
@@ -382,12 +381,33 @@ var config = {
     {
       id: "ende",
       alignment: "center",
+      fitToStreetBounds: false,
       hidden: false,
       title: "",
       description:
-        "Straßennamen spiegeln nicht nur die große Geschichte wider. Wir alle haben einen persönlichen Bezug zu ihnen: Sicherlich erinnerst du dich noch an die Straße, in der du aufgewachsen bist? Diese abstrakten Daten sind für Menschen, die hier leben, sehr persönlich. Und so werden sie immer wieder zum Gegenstand von Debatten – weil Straßennamen nicht nur zeigen, wer war, sondern entscheiden, wen wir erinnern wollen.",
+        "Wer durch die Straßen Berlins geht, bewegt sich nicht nur durch die Stadt, sondern zugleich durch die Schichten ihrer Vergangenheit. Die Straßennamen tragen Spuren ihrer Entstehung, erzählen von Konflikten und politischen Umbrüchen. Einige Namen erschließen sich direkt, andere geben ihre Geschichte erst auf den zweiten Blick preis. Aber eines steht fest: Ihre Bedeutung ist nie festgeschrieben. Sie verändert sich mit dem Lauf der Zeit – und damit unser Blick auf die Geschichte.",
       location: {
-        center: [13.405, 52.52],
+        center: [13.398058, 52.520545],
+        zoom: 10.5,
+        pitch: 20,
+        bearing: 0,
+      },
+      mapAnimation: "flyTo",
+      rotateAnimation: false,
+      callback: "",
+      onChapterEnter: [],
+      onChapterExit: [],
+    },
+    {
+      id: "credits",
+      alignment: "center",
+      fitToStreetBounds: false,
+      hidden: false,
+      title: "",
+      description:
+        'Datenquelle: <a href="https://daten.berlin.de/datensaetze/stra%C3%9Fenabschnitte-berlin" target="_blank">Straßenabschnitte RBS Berlin</a> (Amt für Statistik Berlin-Brandenburg, CC-BY-3.0)<br><br>Created using <a href="https://maplibre.org/maplibre-gl-js/docs/" target="_blank">MapLibre GL JS</a> + <a href="https://github.com/russellsamora/scrollama" target="_blank">Scrollama</a>.',
+      location: {
+        center: [13.398058, 52.520545],
         zoom: 10.5,
         pitch: 20,
         bearing: 0,
